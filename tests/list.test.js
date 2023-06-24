@@ -83,4 +83,8 @@ describe('favourite blog', () => {
 			url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
 		});
 	});
+	test('author with the most blogs to be Robert C. Martin with 3', () => {
+		const result = listHelper.mostBlogs(blogs);
+		expect(result).toEqual({ author: 'Robert C. Martin', blogs: 3 });
+	});
 });

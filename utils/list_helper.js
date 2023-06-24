@@ -16,8 +16,28 @@ const favouriteBlog = (blogs) => {
 	return favouriteBlog;
 };
 
+const mostBlogs = (blogs) => {
+	let mostBlogs = {};
+
+	blogs.forEach((blog) => {
+		if (!mostBlogs[blog.author]) {
+			mostBlogs[blog.author] = 1;
+		} else {
+			mostBlogs[blog.author] += 1;
+		}
+	});
+	const mostProlificAuthor = Object.entries(mostBlogs).sort(
+		(a, b) => b[1] - a[1]
+	)[0];
+	return {
+		author: mostProlificAuthor[0],
+		blogs: mostProlificAuthor[1],
+	};
+};
+
 module.exports = {
 	dummy,
 	totalLikes,
 	favouriteBlog,
+	mostBlogs,
 };
