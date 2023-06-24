@@ -14,6 +14,8 @@ const blogSchema = new mongoose.Schema({
 const Blog = mongoose.model('Blog', blogSchema);
 
 const mongoUrl = `${process.env.MONGO_DB_URI}`;
+
+console.log('Connecting to db...');
 mongoose.connect(mongoUrl);
 
 app.use(cors());
