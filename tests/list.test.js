@@ -83,8 +83,21 @@ describe('favourite blog', () => {
 			url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
 		});
 	});
+});
+
+describe('author with most blogs', () => {
 	test('author with the most blogs to be Robert C. Martin with 3', () => {
 		const result = listHelper.mostBlogs(blogs);
 		expect(result).toEqual({ author: 'Robert C. Martin', blogs: 3 });
+	});
+});
+
+describe('author with most likes in total', () => {
+	test('author to be Edsger W. Dijkstra with 17 likes', () => {
+		const result = listHelper.mostLikes(blogs);
+		expect(result).toEqual({
+			author: 'Edsger W. Dijkstra',
+			likes: 17,
+		});
 	});
 });
