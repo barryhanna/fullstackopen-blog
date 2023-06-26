@@ -11,6 +11,13 @@ blogsRouter.post('/', async (request, response) => {
 	if (!blog.likes) {
 		blog.likes = 0;
 	}
+	if (!blog.title || !blog.url) {
+		return response
+			.status(400)
+			.json({
+				error: 'Bad request: a title and url must both be provided.',
+			});
+	}
 	const result = await blog.save();
 	response.status(201).json(result);
 });

@@ -66,6 +66,16 @@ describe('blog tests', () => {
 
 		expect(result.body.likes).toBe(0);
 	});
+
+	test('title or url properties are missing from the request data, return 400 bad request', async () => {
+		const newBlog = {
+			author: 'Test Author',
+		};
+		const result = await api
+			.post('/api/blogs')
+			.send(newBlog)
+			.expect(400);
+	});
 });
 
 afterAll(async () => {
