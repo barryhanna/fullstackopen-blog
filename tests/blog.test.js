@@ -26,6 +26,15 @@ describe('blog tests', () => {
 			.expect('Content-Type', /application\/json/);
 		expect(result.body.length).toEqual(initialNumberOfBlogs);
 	}, 100000);
+
+	test('unique identifier property of the blog posts is named id', async () => {
+		const result = await api
+			.get('/api/blogs')
+			.expect(200)
+			.expect('Content-Type', /application\/json/);
+		console.log('RESULT', result);
+		expect(result.body[0].id).toBeDefined();
+	});
 });
 
 afterAll(async () => {
