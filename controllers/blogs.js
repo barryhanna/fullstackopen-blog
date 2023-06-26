@@ -1,4 +1,5 @@
 const blogsRouter = require('express').Router();
+const { response } = require('../app');
 const Blog = require('../models/blog');
 
 blogsRouter.get('/', async (request, response) => {
@@ -18,6 +19,17 @@ blogsRouter.post('/', async (request, response) => {
 	}
 	const result = await blog.save();
 	response.status(201).json(result);
+});
+
+blogsRouter.patch('/:id', async (request, response) => {
+	const updateBlog = await Blog.findByIdAndUpdate(
+		{
+			_id: request.params.id,
+		},
+		{ ...request.body },
+		{ returnDocument: 'after' }
+	);
+	response.status(200).json(updateBlog);
 });
 
 blogsRouter.delete('/:id', async (request, response) => {

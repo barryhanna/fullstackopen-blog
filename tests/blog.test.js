@@ -92,6 +92,31 @@ describe('deleting blogs', () => {
 	}, 100000);
 });
 
+describe('updating blogs', () => {
+	test('update likes by 1 to be 2', async () => {
+		const newBlog = {
+			title: 'New blog to test likes increment',
+			author: 'Test Author',
+			url: 'http://newblog.com',
+			likes: 1,
+		};
+		const blogToUpdate = await api
+			.post('/api/blogs')
+			.send(newBlog)
+			.expect(201);
+		const result = await api
+			.patch(`/api/blogs/${blogToUpdate.body.id}`)
+			.send({
+				...newBlog,
+				likes: newBlog.likes + 1,
+			})
+			.expect(200)
+			.expect('Content-Type', /application\/json/);
+
+		expect(result.body.likes).toBe(2);
+	});
+});
+
 afterAll(async () => {
 	await mongoose.connection.close();
 });
