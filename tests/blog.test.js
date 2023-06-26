@@ -34,7 +34,9 @@ describe('blog tests', () => {
 			.expect('Content-Type', /application\/json/);
 		expect(result.body[0].id).toBeDefined();
 	});
+});
 
+describe('creating new blogs', () => {
 	test('an HTTP POST request to the /api/blogs URL successfully creates a new blog post', async () => {
 		const newBlog = {
 			title: 'New Blog - Post Test',
@@ -52,7 +54,6 @@ describe('blog tests', () => {
 			id: result.body.id,
 		});
 	});
-
 	test('missing likes will default to 0', async () => {
 		const newBlog = {
 			title: 'New Blog - Test Missing Likes Results in likes being 0',
@@ -71,11 +72,24 @@ describe('blog tests', () => {
 		const newBlog = {
 			author: 'Test Author',
 		};
+		await api.post('/api/blogs').send(newBlog).expect(400);
+	});
+});
+
+describe('deleting blogs', () => {
+	test('delete a blog post and get a 204 response status code', async () => {
+		const newBlog = {
+			title: 'New blog to test delete',
+			author: 'Test Author',
+			url: 'http://newblog.com',
+			likes: 100,
+		};
 		const result = await api
 			.post('/api/blogs')
 			.send(newBlog)
-			.expect(400);
-	});
+			.expect(201);
+		await api.delete(`/api/blogs/${result.body.id}`).expect(204);
+	}, 100000);
 });
 
 afterAll(async () => {

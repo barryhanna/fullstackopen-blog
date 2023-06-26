@@ -12,14 +12,17 @@ blogsRouter.post('/', async (request, response) => {
 		blog.likes = 0;
 	}
 	if (!blog.title || !blog.url) {
-		return response
-			.status(400)
-			.json({
-				error: 'Bad request: a title and url must both be provided.',
-			});
+		return response.status(400).json({
+			error: 'Bad request: a title and url must both be provided.',
+		});
 	}
 	const result = await blog.save();
 	response.status(201).json(result);
+});
+
+blogsRouter.delete('/:id', async (request, response) => {
+	await Blog.findByIdAndDelete(request.params.id);
+	response.status(204).json({ message: 'Item deleted' });
 });
 
 module.exports = blogsRouter;
