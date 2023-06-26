@@ -32,8 +32,25 @@ describe('blog tests', () => {
 			.get('/api/blogs')
 			.expect(200)
 			.expect('Content-Type', /application\/json/);
-		console.log('RESULT', result);
 		expect(result.body[0].id).toBeDefined();
+	});
+
+	test('an HTTP POST request to the /api/blogs URL successfully creates a new blog post', async () => {
+		const newBlog = {
+			title: 'New Blog - Post Test',
+			author: 'Test Author',
+			url: 'http://newblog.com',
+			likes: 12,
+		};
+		const result = await api
+			.post('/api/blogs')
+			.send(newBlog)
+			.expect(201);
+
+		expect(result.body).toEqual({
+			...newBlog,
+			id: result.body.id,
+		});
 	});
 });
 
