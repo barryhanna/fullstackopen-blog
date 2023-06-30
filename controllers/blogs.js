@@ -2,17 +2,10 @@ const blogsRouter = require('express').Router();
 const jwt = require('jsonwebtoken');
 const Blog = require('../models/blog');
 const User = require('../models/user');
-
-const getTokenFrom = (request) => {
-	const authorization = request.get('authorization');
-	if (authorization && authorization.startsWith('Bearer ')) {
-		return authorization.replace('Bearer ', '');
-	}
-	return null;
-};
+const { getTokenFrom } = require('../utils/middleware');
 
 blogsRouter.get('/', async (request, response) => {
-	const blogs = await Blog.find({});
+	const blogs = await Blog.find({}).populate('user');
 	response.json(blogs);
 });
 
@@ -29,7 +22,18 @@ blogsRouter.post('/', async (request, response) => {
 	}
 	const user = await User.findById(decodedToken.id);
 
-	const blog = new Blog(body);
+	const blogCreators = await User.find({});
+	const randomBlogCreator =
+		blogCreators[Math.floor(Math.random() * blogCreators.length)];
+
+	const blog = new Blog({
+		...body,
+		user: {
+			username: randomBlogCreator.username,
+			name: randomBlogCreator.name,
+			id: randomBlogCreator.id,
+		},
+	});
 
 	if (!blog.likes) {
 		blog.likes = 0;

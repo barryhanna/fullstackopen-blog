@@ -5,7 +5,13 @@ const blogSchema = new mongoose.Schema({
 	author: String,
 	url: String,
 	likes: Number,
-	userId: String,
+	user: {
+		id: {
+			type: mongoose.Schema.Types.ObjectId,
+		},
+		name: String,
+		username: String,
+	},
 	blogs: [String],
 });
 
