@@ -2,13 +2,14 @@ const blogsRouter = require('express').Router();
 const jwt = require('jsonwebtoken');
 const Blog = require('../models/blog');
 const User = require('../models/user');
+const { userExtractor } = require('../utils/middleware');
 
 blogsRouter.get('/', async (request, response) => {
 	const blogs = await Blog.find({}).populate('user');
 	response.json(blogs);
 });
 
-blogsRouter.post('/', async (request, response) => {
+blogsRouter.post('/', userExtractor, async (request, response) => {
 	const body = request.body;
 	const token = request.token;
 
@@ -43,41 +44,50 @@ blogsRouter.post('/', async (request, response) => {
 	response.status(201).json(result);
 });
 
-blogsRouter.patch('/:id', async (request, response) => {
-	const updateBlog = await Blog.findByIdAndUpdate(
-		{
-			_id: request.params.id,
-		},
-		{ ...request.body },
-		{ returnDocument: 'after' }
-	);
-	response.status(200).json(updateBlog);
-});
-
-blogsRouter.delete('/:id', async (request, response) => {
-	const token = request.token;
-
-	if (!token) {
-		response.status(401).json({
-			error: 'You must be logged in to complete this action',
-		});
+blogsRouter.patch(
+	'/:id',
+	userExtractor,
+	async (request, response) => {
+		const updateBlog = await Blog.findByIdAndUpdate(
+			{
+				_id: request.params.id,
+			},
+			{ ...request.body },
+			{ returnDocument: 'after' }
+		);
+		response.status(200).json(updateBlog);
 	}
+);
 
-	const blog = await Blog.findById(request.params.id);
-	if (!blog) {
-		response.status(404).json({ message: 'No blog found' });
+blogsRouter.delete(
+	'/:id',
+	userExtractor,
+	async (request, response) => {
+		const token = request.token;
+
+		if (!token) {
+			response.status(401).json({
+				error: 'You must be logged in to complete this action',
+			});
+		}
+
+		const blog = await Blog.findById(request.params.id);
+		if (!blog) {
+			response.status(404).json({ message: 'No blog found' });
+		}
+
+		const decodedToken = jwt.verify(token, process.env.SECRET);
+
+		if (blog.user.id.toString() === decodedToken.id) {
+			await Blog.findByIdAndDelete(request.params.id);
+			return response.status(204).json({ message: 'Item deleted' });
+		} else {
+			response.status(401).json({
+				error:
+					'Blogs can only be deleted by the user who created them',
+			});
+		}
 	}
-
-	const decodedToken = jwt.verify(token, process.env.SECRET);
-
-	if (blog.user.id.toString() === decodedToken.id) {
-		await Blog.findByIdAndDelete(request.params.id);
-		return response.status(204).json({ message: 'Item deleted' });
-	} else {
-		response.status(401).json({
-			error: 'Blogs can only be deleted by the user who created them',
-		});
-	}
-});
+);
 
 module.exports = blogsRouter;
