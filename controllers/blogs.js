@@ -22,16 +22,12 @@ blogsRouter.post('/', async (request, response) => {
 	}
 	const user = await User.findById(decodedToken.id);
 
-	const blogCreators = await User.find({});
-	const randomBlogCreator =
-		blogCreators[Math.floor(Math.random() * blogCreators.length)];
-
 	const blog = new Blog({
 		...body,
 		user: {
-			username: randomBlogCreator.username,
-			name: randomBlogCreator.name,
-			id: randomBlogCreator.id,
+			username: decodedToken.username,
+			name: user.name,
+			id: decodedToken.id,
 		},
 	});
 
