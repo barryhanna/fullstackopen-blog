@@ -55,8 +55,28 @@ blogsRouter.patch('/:id', async (request, response) => {
 });
 
 blogsRouter.delete('/:id', async (request, response) => {
-	await Blog.findByIdAndDelete(request.params.id);
-	response.status(204).json({ message: 'Item deleted' });
+	const token = request.token;
+
+	if (!token) {
+		response.status(401).json({
+			error: 'You must be logged in to complete this action',
+		});
+	}
+
+	const blog = await Blog.findById(request.params.id);
+	if (!blog) {
+		response.status(404).json({ message: 'No blog found' });
+	}
+	const decodedToken = jwt.verify(token, process.env.SECRET);
+	console.log('DECODED TOKEN: ', decodedToken);
+	console.log('USER:', blog);
+	if (blog.user.id.toString() === decodedToken.id) {
+		await Blog.findByIdAndDelete(request.params.id);
+		return response.status(204).json({ message: 'Item deleted' });
+	}
+	response
+		.status(500)
+		.json({ error: 'There was a problem deleting that item' });
 });
 
 module.exports = blogsRouter;
