@@ -67,16 +67,17 @@ blogsRouter.delete('/:id', async (request, response) => {
 	if (!blog) {
 		response.status(404).json({ message: 'No blog found' });
 	}
+
 	const decodedToken = jwt.verify(token, process.env.SECRET);
-	console.log('DECODED TOKEN: ', decodedToken);
-	console.log('USER:', blog);
+
 	if (blog.user.id.toString() === decodedToken.id) {
 		await Blog.findByIdAndDelete(request.params.id);
 		return response.status(204).json({ message: 'Item deleted' });
+	} else {
+		response.status(401).json({
+			error: 'Blogs can only be deleted by the user who created them',
+		});
 	}
-	response
-		.status(500)
-		.json({ error: 'There was a problem deleting that item' });
 });
 
 module.exports = blogsRouter;
