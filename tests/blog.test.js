@@ -38,12 +38,32 @@ describe('blog tests', () => {
 
 describe('creating new blogs', () => {
 	test('an HTTP POST request to the /api/blogs URL successfully creates a new blog post', async () => {
+		const newUser = {
+			username: 'tester',
+			name: 'testuser',
+			password: 'passtest',
+		};
+
+		await api
+			.post('/api/users')
+			.send(newUser)
+			.expect(201)
+			.expect('Content-Type', /application\/json/);
+
+		const token = await api.post('/api/login').send({
+			username: newUser.username,
+			password: newUser.password,
+		});
+
+		console.log('TOKEN: ', token);
+
 		const newBlog = {
 			title: 'New Blog - Post Test',
 			author: 'Test Author',
 			url: 'http://newblog.com',
 			likes: 12,
 		};
+
 		const result = await api
 			.post('/api/blogs')
 			.send(newBlog)
@@ -73,6 +93,16 @@ describe('creating new blogs', () => {
 			author: 'Test Author',
 		};
 		await api.post('/api/blogs').send(newBlog).expect(400);
+	});
+
+	test('creating a new blog without an authorization token fails', async () => {
+		const newBlog = {
+			title: 'New Blog - Auth Test',
+			author: 'Sneak Author',
+			url: 'http://newblog.com',
+			likes: 122,
+		};
+		await api.post('/api/blogs').send(newBlog).expect(401);
 	});
 });
 
