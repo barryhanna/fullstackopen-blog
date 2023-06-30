@@ -26,7 +26,12 @@ const getTokenFrom = (request) => {
 	return null;
 };
 
+const tokenExtractor = (request, response, next) => {
+	request.token = getTokenFrom(request);
+	next();
+};
+
 module.exports = {
 	errorHandler,
-	getTokenFrom,
+	tokenExtractor,
 };
