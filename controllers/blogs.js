@@ -48,6 +48,14 @@ blogsRouter.patch(
 	'/:id',
 	userExtractor,
 	async (request, response) => {
+		const token = request.token;
+
+		const decodedToken = jwt.verify(token, process.env.SECRET);
+
+		if (!decodedToken.id) {
+			return response.status(401).json({ error: 'token invalid' });
+		}
+
 		const updateBlog = await Blog.findByIdAndUpdate(
 			{
 				_id: request.params.id,
