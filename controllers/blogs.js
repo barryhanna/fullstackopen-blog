@@ -11,9 +11,8 @@ blogsRouter.get('/', async (request, response) => {
 
 blogsRouter.post('/', userExtractor, async (request, response) => {
 	const body = request.body;
-	const token = request.token;
 
-	const decodedToken = jwt.verify(token, process.env.SECRET);
+	const decodedToken = jwt.verify(request.token, process.env.SECRET);
 
 	if (!decodedToken.id) {
 		return response.status(401).json({ error: 'token invalid' });
@@ -56,11 +55,19 @@ blogsRouter.patch(
 			return response.status(401).json({ error: 'token invalid' });
 		}
 
+		const user = await User.findById(decodedToken.id);
 		const updateBlog = await Blog.findByIdAndUpdate(
 			{
 				_id: request.params.id,
 			},
-			{ ...request.body },
+			{
+				...request.body,
+				user: {
+					id: decodedToken.id,
+					username: decodedToken.username,
+					name: user.name,
+				},
+			},
 			{ returnDocument: 'after' }
 		);
 		response.status(200).json(updateBlog);
