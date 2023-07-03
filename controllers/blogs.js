@@ -74,14 +74,14 @@ blogsRouter.delete(
 		const token = request.token;
 
 		if (!token) {
-			response.status(401).json({
+			return response.status(401).json({
 				error: 'You must be logged in to complete this action',
 			});
 		}
 
 		const blog = await Blog.findById(request.params.id);
 		if (!blog) {
-			response.status(404).json({ message: 'No blog found' });
+			return response.status(404).json({ message: 'No blog found' });
 		}
 
 		const decodedToken = jwt.verify(token, process.env.SECRET);
